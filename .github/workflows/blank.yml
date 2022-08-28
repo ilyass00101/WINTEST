@@ -1,9 +1,13 @@
 name: Windows-RDP
+
 on: workflow_dispatch
+
+
 jobs:
   build:
     runs-on: windows-latest
     timeout-minutes: 999999999999
+    
     steps:
     - name: Download Ngrok.
       run: |
@@ -23,7 +27,15 @@ jobs:
     - name: Extract Ngrok File.
       run: Expand-Archive ngrok.zip
     - name: Connect Ngrok.
-@@ -38,7 +37,6 @@ jobs:
+      run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+      env:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+    - name: Action Access RDP.
+      run: | 
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+        copy wallpaper.png D:\a\wallpaper.png
         copy wallpaper.bat D:\a\wallpaper.bat
         copy "TG Group.url" "C:\Users\Public\Desktop\TG Group.url"
         copy "Sellix Store.url" "C:\Users\Public\Desktop\Sellix Store.url"
